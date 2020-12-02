@@ -113,6 +113,54 @@ public class ActHandler extends ActImplBase {
     }
 
     @Override
+    public void placeOrderCancelFIX(PlaceMessageRequest request, StreamObserver<PlaceMessageResponse> responseObserver) {
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("placeOrderCancelFIX request: " + shortDebugString(request));
+            }
+            placeMessage(request, responseObserver, "replaceOrderFIX", "ClOrdID", request.getMessage().getFieldsMap().get("ClOrdID").getSimpleValue(),
+                    ImmutableSet.of("ExecutionReport", "OrderCancelReject"), "placeOrderCancelFIX");
+        } catch (RuntimeException | JsonProcessingException e) {
+            logger.error("Cancel Order failed. Message = {}", request.getMessage(), e);
+            sendErrorResponse(responseObserver, "Cancel Order failed. See the logs.");
+        } finally {
+            logger.debug("placeOrderCancelFIX finished");
+        }
+    }
+
+    @Override
+    public void placeOrderCancelReplaceFIX(PlaceMessageRequest request, StreamObserver<PlaceMessageResponse> responseObserver) {
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("placeOrderCancelReplaceFIX request: " + shortDebugString(request));
+            }
+            placeMessage(request, responseObserver, "placeOrderCancelReplaceFIX", "ClOrdID", request.getMessage().getFieldsMap().get("ClOrdID").getSimpleValue(),
+                    ImmutableSet.of("ExecutionReport", "OrderCancelReject"), "placeOrderCancelReplaceFIX");
+        } catch (RuntimeException | JsonProcessingException e) {
+            logger.error("Replace Order failed. Message = {}", request.getMessage(), e);
+            sendErrorResponse(responseObserver, "Replace Order failed. See the logs.");
+        } finally {
+            logger.debug("placeOrderCancelReplaceFIX finished");
+        }
+    }
+
+    @Override
+    public void placeSecurityStatusRequestFIX(PlaceMessageRequest request, StreamObserver<PlaceMessageResponse> responseObserver) {
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("placeSecurityStatusRequestFIX request: " + shortDebugString(request));
+            }
+            placeMessage(request, responseObserver, "placeSecurityStatusRequestFIX", "SecurityStatusReqID", request.getMessage().getFieldsMap().get("SecurityStatusReqID").getSimpleValue(),
+                    ImmutableSet.of("SecurityStatus"), "placeOrderCancelReplaceFIX");
+        } catch (RuntimeException | JsonProcessingException e) {
+            logger.error("Place Order failed. Message = {}", request.getMessage(), e);
+            sendErrorResponse(responseObserver, "Replace Order failed. See the logs.");
+        } finally {
+            logger.debug("placeSecurityStatusRequestFIX finished");
+        }
+    }
+
+    @Override
     public void sendMessage(PlaceMessageRequest request, StreamObserver<SendMessageResponse> responseObserver) {
         long startPlaceMessage = System.currentTimeMillis();
         try {
